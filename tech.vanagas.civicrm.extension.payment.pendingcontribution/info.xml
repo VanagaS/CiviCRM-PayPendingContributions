@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<extension key="tech.vanagas.civicrm.extension.payment.pendingcontribution" type="module">
+  <file>pendingcontribution</file>
+  <name>PendingContribution</name>
+  <description>Pay Pending Contribution</description>
+  <license>GPL-3.0</license>
+  <maintainer>
+    <author>Aditya Naga Sanjeevi, Yellapu</author>
+    <email>sanjeev.any@gmail.com</email>
+  </maintainer>
+  <urls>
+    <url desc="Main Extension Page">http://FIXME</url>
+    <url desc="Documentation">http://FIXME</url>
+    <url desc="Support">http://FIXME</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/gpl-3.0.html</url>
+  </urls>
+  <releaseDate>2016-09-04</releaseDate>
+  <version>1.0</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>4.2</ver>
+  </compatibility>
+  <comments>Pay Pending Contribution</comments>
+  <civix>
+    <namespace>CRM/Pendingcontribution</namespace>
+  </civix>
+  <typeInfo>
+    <userNameLabel>Purchase Item ID</userNameLabel>
+    <passwordLabel></passwordLabel>
+    <signatureLabel></signatureLabel>
+    <subjectLabel></subjectLabel>
+    <urlSiteDefault>https://live.exmpale.com</urlSiteDefault>
+    <urlApiDefault></urlApiDefault>
+    <urlRecurDefault></urlRecurDefault>
+    <urlSiteTestDefault>https://test.example.com</urlSiteTestDefault>
+    <urlApiTestDefault></urlApiTestDefault>
+    <urlRecurTestDefault></urlRecurTestDefault>
+    <urlButtonDefault></urlButtonDefault>
+    <urlButtonTestDefault></urlButtonTestDefault>
+    <billingMode>form</billingMode>
+    <isRecur>0</isRecur>
+    <paymentType>1</paymentType>
+  </typeInfo>
+</extension>

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/list-pending-contributions</path>
+    <page_callback>CRM_Pendingcontribution_Page_ListPendingContributions</page_callback>
+    <title>ListPendingContributions</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/pay-pending-contributions</path>
+    <page_callback>CRM_Pendingcontribution_Page_PayPendingContributions</page_callback>
+    <title>PayPendingContributions</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/pay-pending-contributions-form</path>
+    <page_callback>CRM_Pendingcontribution_Form_PayPendingContributionsForm</page_callback>
+    <title>PayPendingContributionsForm</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/payment-processor-form</path>
+    <page_callback>CRM_Pendingcontribution_Form_PaymentProcessorForm</page_callback>
+    <title>PaymentProcessorForm</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>

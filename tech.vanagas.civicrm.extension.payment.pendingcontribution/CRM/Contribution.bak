@@ -1,0 +1,232 @@
+<?php
+
+namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
+
+    /**
+     * Class Contribution
+     * @package tech\vanagas\civicrm\extension\payment\pendingcontribution
+     */
+    class Contribution
+    {
+        /**
+         * Amount designated for contribution.
+         *
+         * @var float
+         */
+        protected $_amount;
+
+        /**
+         * Type of contribution (Donation/Event Fees/Membership...).
+         *
+         * @var string
+         */
+        protected $_financialType;
+
+        /**
+         * The source for which this contribution was made for.
+         *
+         * @var string
+         */
+        protected $_contributionSource;
+
+        /**
+         * The current status of the contribution ("Pending", "In Progress", "Overdue", "Partially paid", "Failed").
+         *
+         * @var boolean
+         */
+        protected $_contributionStatus;
+
+        /**
+         * Is this a Pledge?
+         *
+         * @var boolean
+         */
+        protected $_isPledge;
+
+        /**
+         * Is this a recurring payment?
+         *
+         * @var boolean
+         */
+        protected $_isRecurring;
+
+        /**
+         * Contact ID of contribution owner
+         *
+         * @var integer
+         */
+        protected $_ownerContactID;
+
+        /**
+         * Display Name of contribution owner
+         *
+         * @var string
+         */
+        protected $_ownerDisplayName;
+
+        /**
+         * Contribution ID
+         *
+         * @var integer
+         */
+        protected $_contributionID;
+
+        /**
+         * Currency of the contribution
+         *
+         * @var string
+         */
+        protected $_currency;
+
+        /**
+         * Is this a recurring payment?
+         *
+         * @var boolean
+         */
+        protected $_isRecurring;
+
+        /**
+         * Is this a recurring payment?
+         *
+         * @var boolean
+         */
+        protected $_isRecurring;
+
+
+        /**
+         * Contribution constructor.
+         * @param float $_amount
+         * @param string $_financialType
+         * @param string $_contributionSource
+         * @param bool $_constributionStatus
+         * @param bool $_isPledge
+         * @param bool $_isRecurring
+         */
+        public function __construct(
+            $_amount,
+            $_financialType,
+            $_contributionSource,
+            $_constributionStatus,
+            $_isPledge,
+            $_isRecurring)
+        {
+            $this->_amount = $_amount;
+            $this->_financialType = $_financialType;
+            $this->_contributionSource = $_contributionSource;
+            $this->_contributionStatus = $_constributionStatus;
+            $this->_isPledge = $_isPledge;
+            $this->_isRecurring = $_isRecurring;
+        }
+
+        /**
+         * @return float
+         */
+        public function getAmount()
+        {
+            return $this->_amount;
+        }
+
+        /**
+         * @param float $amount
+         * @return Contribution
+         */
+        public function setAmount($amount)
+        {
+            $this->_amount = $amount;
+            return $this;
+        }
+
+        /**
+         * @return string
+         */
+        public function getFinancialType()
+        {
+            return $this->_financialType;
+        }
+
+        /**
+         * @param string $financialType
+         * @return Contribution
+         */
+        public function setFinancialType($financialType)
+        {
+            $this->_financialType = $financialType;
+            return $this;
+        }
+
+        /**
+         * @return string
+         */
+        public function getContributionSource()
+        {
+            return $this->_contributionSource;
+        }
+
+        /**
+         * @param string $contributionSource
+         * @return Contribution
+         */
+        public function setContributionSource($contributionSource)
+        {
+            $this->_contributionSource = $contributionSource;
+            return $this;
+        }
+
+        /**
+         * @return boolean
+         */
+        public function isContributionStatus()
+        {
+            return $this->_contributionStatus;
+        }
+
+        /**
+         * @param boolean $constributionStatus
+         * @return Contribution
+         */
+        public function setContributionStatus($constributionStatus)
+        {
+            $this->_contributionStatus = $constributionStatus;
+            return $this;
+        }
+
+        /**
+         * @return boolean
+         */
+        public function isIsPledge()
+        {
+            return $this->_isPledge;
+        }
+
+        /**
+         * @param boolean $isPledge
+         * @return Contribution
+         */
+        public function setIsPledge($isPledge)
+        {
+            $this->_isPledge = $isPledge;
+            return $this;
+        }
+
+        /**
+         * @return boolean
+         */
+        public function isIsRecurring()
+        {
+            return $this->_isRecurring;
+        }
+
+        /**
+         * @param boolean $isRecurring
+         * @return Contribution
+         */
+        public function setIsRecurring($isRecurring)
+        {
+            $this->_isRecurring = $isRecurring;
+            return $this;
+        }
+
+
+
+    }
+}

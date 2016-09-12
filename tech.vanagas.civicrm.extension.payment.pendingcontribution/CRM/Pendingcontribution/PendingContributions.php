@@ -80,14 +80,14 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
          *
          * @var boolean
          */
-        protected $_isError;
+        protected $_isPPCFError;
 
         /**
          * If there is any error, what's the error message
          *
          * @var string
          */
-        protected $_errorMessage;
+        protected $_ppcfErrorMessage;
 
         /**
          * Store the reference to form
@@ -125,6 +125,8 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
 
         public function setupFormVariables()
         {
+            /* Refresh for latest data */
+
             /* Pass the user id to template */
             $this->_form->assign('contact_id', $this->_id);
             /* Pass the contribution(s) (array) to template */
@@ -132,15 +134,21 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
             /* Pass the default (selected) contribution to template */
             $this->_form->assign('selected_contribution', $this->_selectedContribution);
             /* Pass on the error state (PayPendingContributionsForm) to template */
-            $this->_form->assign('ppcf_error_status', $this->_isError);
+            $this->_form->assign('ppcf_error_status', $this->_isPPCFError);
             /* Pass on the error message (PayPendingContributionsForm) to template */
-            $this->_form->assign('ppcf_error_message', $this->_errorMessage);
-            /* Contribution Amount */
-            $this->_form->assign('contribution_amount', $this->_selectedContribution->getAmount());
-            $this->_form->assign('currency', $this->_selectedContribution->getCurrency());
+            $this->_form->assign('ppcf_error_message', $this->_ppcfErrorMessage);
 
-            /* All all the imported Objects */
-            $this->_contributionPage->setupFormVariables();
+            if (!is_null($this->_selectedContribution)) {
+                /* Contribution Amount */
+                $this->_form->assign('contribution_amount', $this->_selectedContribution->getAmount());
+                $this->_form->assign('currency', $this->_selectedContribution->getCurrency());
+
+                /* All all the imported Objects */
+                $this->_contributionPage->setupFormVariables();
+            } else {
+                /* We reach here when contribution ID is not specified and we are providing a list of pending contributions. */
+            }
+
         }
 
         /**
@@ -183,7 +191,7 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
              * skip restriction on fetching data for the logged in user only. If contribution id is not given, then
              * lets limit the pending contributions to logged in user only.         *
              */
-            if (!is_null($this->_contribution)) {
+            if ($this->_contribution) {
                 $params['id'] = $this->_contribution;
             } else {
                 /* Since we only fetch the logged in user's data, lets update the given contributions as user owned. */
@@ -222,17 +230,19 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
                             if ($this->_contributionOwner == $this->_id) {
                                 $this->_isOwner = true; /* Reset the value of _isOwner */
                             } else {
-                                $this->_errorMessage = ts('You are not the owner of the requested contribution. Please 
-                            check if the provided contribution id is not given by mistake.<br/><br/> However, you may continue 
-                            to make payment for other users as well, if it is intended.');
+                                $this->setPpcfErrorMessage(ts('You are not the owner of the requested contribution. Please check if the provided contribution id is not given by mistake.<br/><br/> However, you may continue to make payment for other users as well, if it is intended.'));
                                 /* Contribution owner is different from the logged in user */
-                                \CRM_Core_Session::setStatus($this->_errorMessage, ts('Check Contribution ID'), 'warning');
+                                \CRM_Core_Session::setStatus($this->_ppcfErrorMessage, ts('Check Contribution ID'), 'warning');
                             }
                         }
                     } else {
-                        $this->_errorMessage = ts('Either the requested contribution ID doesn\'t exist or you do not have any pending payments for the given contribution ID');
-                        /* No results returned */
-                        \CRM_Core_Session::setStatus($this->_errorMessage, ts('Check Contribution ID'), 'warning');
+                        if($this->_contribution) {
+                            $this->setPpcfErrorMessage(ts('Either the requested contribution ID doesn\'t exist or you do not have any pending payments for the given contribution ID'));
+                            \CRM_Core_Session::setStatus($this->_ppcfErrorMessage, ts('Check Contribution ID'), 'warning');
+                        } else {
+                            $this->setPpcfErrorMessage(ts('Since a contribution ID is not specified in the URL (contribution=XXX), we tried to fetch a list of pending contributions registered on your account. But none found!'));
+                            \CRM_Core_Session::setStatus($this->_ppcfErrorMessage, ts('No Pending transactions found!'), 'warning');
+                        }
                     }
                 }
             } catch (\CiviCRM_API3_Exception $e) {
@@ -471,36 +481,37 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
         /**
          * @return boolean
          */
-        public function isIsError()
+        public function isIsPPCFError()
         {
-            return $this->_isError;
+            return $this->_isPPCFError;
         }
 
         /**
          * @param boolean $isError
          * @return PendingContributions
          */
-        public function setIsError($isError)
+        public function setIsPPCFError($isError)
         {
-            $this->_isError = $isError;
+            $this->_isPPCFError = $isError;
             return $this;
         }
 
         /**
          * @return string
          */
-        public function getErrorMessage()
+        public function getPpcfErrorMessage()
         {
-            return $this->_errorMessage;
+            return $this->_ppcfErrorMessage;
         }
 
         /**
          * @param string $errorMessage
          * @return PendingContributions
          */
-        public function setErrorMessage($errorMessage)
+        public function setPpcfErrorMessage($errorMessage)
         {
-            $this->_errorMessage = $errorMessage;
+            $this->_isPPCFError = true;
+            $this->_ppcfErrorMessage = $errorMessage;
             return $this;
         }
 

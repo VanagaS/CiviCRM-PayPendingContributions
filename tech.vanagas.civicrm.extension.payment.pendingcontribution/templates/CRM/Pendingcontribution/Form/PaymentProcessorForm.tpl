@@ -1,7 +1,7 @@
 {if $action & 1024}
     {include file="CRM/Contribute/Form/Contribution/PreviewHeader.tpl"}
 {/if}
-{if !$ppcf_error_status}
+{if $ppcf_error_status}
     <div class="messages status no-popup">
         <span>{$ppcf_error_message}</span>
     </div>

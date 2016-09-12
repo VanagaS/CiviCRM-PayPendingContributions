@@ -1,5 +1,6 @@
 {* HEADER *}
-{if $contributions|@count < 0} {* disabled this for now *}
+{* disabled this for now *}
+{*if $contributions|@count < 0}
     {if $ppcf_error_status}
         {assign var="my-error-message" value=$ppcf_error_message}
         <div class="messages status no-popup crm-not-you-message">
@@ -11,7 +12,7 @@
         </div>
     {/if}
     {include file="CRM/Pendingcontribution/Form/PendingContributionList.tpl" location="top"}
-{else}
+{else *}
     <div class="crm-block crm-content-block crm-contribution-view-form-block">
 
         <div class="action-link">
@@ -20,13 +21,8 @@
             </div>
         </div>
         {if $ppcf_error_status}
-            {assign var="my-error-message" value=$ppcf_error_message}
             <div class="messages status no-popup crm-not-you-message">
-                <table>
-                    <tr>
-                        <td>{$my-error-message}</td>
-                    </tr>
-                </table>
+                <span>{$ppcf_error_message}</span>
             </div>
         {/if}
 
@@ -57,7 +53,7 @@
                     <tr>
                         <td class="label">{ts}Total Amount{/ts}</td>
                         <td><strong><a class="nowrap bold crm-expand-row" title="{ts}view payments{/ts}"
-                                       href="{crmURL p='civicrm/payment' q="view=transaction&component=contribution&action=browse&cid=`$contact_id`&id=`$contribution_id`&selector=1"}">
+                                       href="{crmURL p='civicrm/pay' q="view=transaction&component=contribution&action=browse&cid=`$contact_id`&id=`$contribution_id`&selector=1"}">
                                     &nbsp; {$contrib->getAmount()|crmMoney:$contrib->getCurrency()}
                             </strong></a>&nbsp;<span
                                     style="font-style: italic">&nbsp;{ts}(click on the amount to see a list of any past payments){/ts}</span>&nbsp;
@@ -69,7 +65,7 @@
                         </td>
                     </tr>
                 {/if}
-                {if $invoicing && $tax_amount}
+                {*if $invoicing && $tax_amount}
                     <tr>
                         <td class="label">{ts}Total Tax Amount{/ts}</td>
                         <td>{$contrib->getAmount()|crmMoney:$contrib->getCurrency()}</td>
@@ -98,7 +94,7 @@
                         <td class="label">{ts}Revenue Recognition Date{/ts}</td>
                         <td>{$revenue_recognition_date|crmDate:"%B, %Y"}</td>
                     </tr>
-                {/if}
+                {/if*}
                 <tr>
                     <td class="label">{ts}Received{/ts}</td>
                     <td>{if $receive_date}{$receive_date|crmDate}{else}({ts}not available{/ts}){/if}</td>
@@ -197,7 +193,6 @@
                 <tr>
                     <td class="label">{ts}Make Payment{/ts}</td>
                     <td>
-                        {assign var="contribution_page_id" value=$contrib->getContributionPageID()}
                         <div class="crm-actions-ribbon crm-contribpage-tab-actions-ribbon">
                             <ul id="actions">
                                 <li>
@@ -208,10 +203,10 @@
                                             <div class="crm-contribpage-links-list-inner">
                                                 <ul>
                                                     <li><br/><a class="crm-contribution-test"
-                                                                href="{crmURL p='civicrm/contribute/transact' q="reset=1&action=preview&id=`$contribution_page_id`"}">{ts}Online Contribution (Test-drive){/ts}</a>
+                                                                href="{crmURL p='civicrm/payment-processor-form' q="reset=1&action=preview&contribution=`$contribution_id`"}">{ts}Online Contribution (Test-drive){/ts}</a>
                                                     </li>
                                                     <li><a class="crm-contribution-live"
-                                                           href="{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$contribution_page_id`" fe='true'}"
+                                                           href="{crmURL p='civicrm/payment-processor-form' q="reset=1&contribution=`$contribution_id`" fe='true'}"
                                                            target="_blank">{ts}Online Contribution (Live){/ts}</a></li>
                                                 </ul>
                                             </div>
@@ -343,7 +338,4 @@
         {/if}
     </div>
     {crmScript file='js/crm.expandRow.js'}
-    <div class="messages status no-popup crm-not-you-message">
-        {$my-error-message}
-    </div>
-{/if}
+{*/if*}

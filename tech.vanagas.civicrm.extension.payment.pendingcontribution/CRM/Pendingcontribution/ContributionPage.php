@@ -647,8 +647,6 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
             return $this;
         }
 
-
-
     }
 
 }

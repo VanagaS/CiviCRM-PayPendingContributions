@@ -1,6 +1,7 @@
 <?php
 
 require_once 'CRM/Core/Form.php';
+require_once 'CRM/Core/Payment/Form.php';
 require_once 'CRM/Pendingcontribution/PendingContributions.php';
 require_once 'CRM/Pendingcontribution/ContributionPage.php';
 
@@ -26,9 +27,12 @@ class CRM_Pendingcontribution_Form_PaymentProcessorForm extends CRM_Core_Form
      * @var array
      */
     public $_paymentFields = array();
+
     protected $_paymentProcessor;
     protected $_paymentProcessorID;
     protected $_paymentProcessors;
+
+    public $_values;
 
     /**
      * Set variables up before form is built.
@@ -45,11 +49,13 @@ class CRM_Pendingcontribution_Form_PaymentProcessorForm extends CRM_Core_Form
 
             /* Setup and initialize payment system) */
             $this->_paymentProcessors = $this->get('paymentProcessors');
-            $paymentProcessor = $this->_pendingContributions->getContributionPage()->getPaymentProcessor();
+            $paymentProcessor = $this->_values['payment_processor'];
             $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessor);
+            $this->assignBillingType();
             //$this->_paymentFields = CRM_Core_Payment_Form::getPaymentFieldMetadata($this->_paymentProcessor);
             $this->preProcessPaymentOptions();
             CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor);
+            CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE);
             //xdebug_var_dump($this);
             //exit;
         }
@@ -61,9 +67,12 @@ class CRM_Pendingcontribution_Form_PaymentProcessorForm extends CRM_Core_Form
     public function buildQuickForm() {
 
         $this->_pendingContributions->setupFormVariables();
-        $contributionPage = $this->_pendingContributions->getContributionPage();
-        \CRM_Utils_System::setTitle(ts($contributionPage->getContributionTitle()));
+        //$contributionPage = $this->_pendingContributions->getContributionPage();
+        CRM_Utils_System::setTitle(ts($this->_values['title']));
+        //$this->assign('paymentFields', $this->_paymentFields);
         parent::buildQuickForm();
+        //xdebug_var_dump($this->_paymentFields);
+        //exit;
 
     }
 

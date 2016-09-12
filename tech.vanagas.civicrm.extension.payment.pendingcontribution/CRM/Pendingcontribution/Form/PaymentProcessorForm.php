@@ -21,6 +21,14 @@ class CRM_Pendingcontribution_Form_PaymentProcessorForm extends CRM_Core_Form
      * @var array (PendingContributions)
      */
     protected $_pendingContributions;
+    /**
+     * Array of payment related fields to potentially display on this form (generally credit card or debit card fields). This is rendered via billingBlock.tpl
+     * @var array
+     */
+    public $_paymentFields = array();
+    protected $_paymentProcessor;
+    protected $_paymentProcessorID;
+    protected $_paymentProcessors;
 
     /**
      * Set variables up before form is built.
@@ -30,15 +38,29 @@ class CRM_Pendingcontribution_Form_PaymentProcessorForm extends CRM_Core_Form
         /* retrieve the value of parameter 'contribution' from URL */
         $contribution_id = CRM_Utils_Request::retrieve('contribution', 'Positive');
 
-        /* instantiate the PendingContributions Object */
-        $this->_pendingContributions = new PendingContributions($contribution_id, $this);
+        if ($contribution_id) {
+            /* instantiate the PendingContributions Object */
+            /* Contribution and ContributionPage objects get loaded by the end of this call */
+            $this->_pendingContributions = new PendingContributions($contribution_id, $this);
 
-        xdebug_var_dump($this->_pendingContributions);
+            /* Setup and initialize payment system) */
+            $this->_paymentProcessors = $this->get('paymentProcessors');
+            $paymentProcessor = $this->_pendingContributions->getContributionPage()->getPaymentProcessor();
+            $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessor);
+            //$this->_paymentFields = CRM_Core_Payment_Form::getPaymentFieldMetadata($this->_paymentProcessor);
+            $this->preProcessPaymentOptions();
+            CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor);
+            //xdebug_var_dump($this);
+            //exit;
+        }
+
+        // xdebug_var_dump($this->_pendingContributions);
         parent::preProcess();
     }
 
-    public function buildQuickForm()
-    {
+    public function buildQuickForm() {
+
+        $this->_pendingContributions->setupFormVariables();
         $contributionPage = $this->_pendingContributions->getContributionPage();
         \CRM_Utils_System::setTitle(ts($contributionPage->getContributionTitle()));
         parent::buildQuickForm();
@@ -310,6 +332,8 @@ class CRM_Pendingcontribution_Form_PaymentProcessorForm extends CRM_Core_Form
         // redirect to thank you page
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_ThankYou_display=1&qfKey=$qfKey", TRUE, NULL, FALSE));
     }
+
+
 
     /**
      * Function for unit tests on the postProcess function.

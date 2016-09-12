@@ -101,19 +101,22 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
          */
         public function __construct($contributionid, &$form)
         {
+
+            /* set the form for assiging variables directly to template */
+            $this->_form = &$form;
+            /* set the selected contribution ID */
+            $this->_contribution = $contributionid;
+
+
             /* get the reference to session object */
             $session = \CRM_Core_Session::singleton();
 
             /* retrieve the logged in user id */
             $this->_id = $session->getLoggedInContactID();
 
-            /* set the selected contribution ID */
-            $this->_contribution = $contributionid;
-
             /* Generate the results of the pending payments for the provided contribution id */
+            /* Contribution and ContributionPage objects get loaded by the end of this call */
             $this->fetchContactsWithPendingPayments(); /* TODO Handle return value (errors) */
-
-            $this->_form = &$form;
 
             /* Set the title for the displayed page */
             \CRM_Utils_System::setTitle(ts('Pay Pending Contributions'));
@@ -132,7 +135,12 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
             $this->_form->assign('ppcf_error_status', $this->_isError);
             /* Pass on the error message (PayPendingContributionsForm) to template */
             $this->_form->assign('ppcf_error_message', $this->_errorMessage);
+            /* Contribution Amount */
+            $this->_form->assign('contribution_amount', $this->_selectedContribution->getAmount());
+            $this->_form->assign('currency', $this->_selectedContribution->getCurrency());
 
+            /* All all the imported Objects */
+            $this->_contributionPage->setupFormVariables();
         }
 
         /**

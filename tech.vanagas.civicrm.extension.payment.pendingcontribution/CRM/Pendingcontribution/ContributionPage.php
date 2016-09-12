@@ -170,6 +170,13 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
         protected $_form;
 
         /**
+         * Store the raw values as is
+         *
+         * @var array
+         */
+        protected $_values;
+
+        /**
          * ContributionPage constructor.
          * @param int $_pageID
          */
@@ -178,25 +185,22 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
             $this->_pageID = $_pageID;
             $this->_form = &$form;
             $this->fetchContributionPage();
-        }
-
-        public function setupFormVariables()
-        {
-            /* Pass the user id to template */
-            $this->_form->assign('contact_id', $this->_id);
-            /* Pass the contribution(s) (array) to template */
-            $this->_form->assign('contributions', $this->_contributions);
-            /* Pass the default (selected) contribution to template */
-            $this->_form->assign('selected_contribution', $this->_selectedContribution);
-            /* Pass on the error state (PayPendingContributionsForm) to template */
-            $this->_form->assign('ppcf_error_status', $this->_isError);
-            /* Pass on the error message (PayPendingContributionsForm) to template */
-            $this->_form->assign('ppcf_error_message', $this->_errorMessage);
-
+            /* Assign the raw object to the form */
+            $this->_form->_values = $this->_values;
         }
 
         /**
-         * @param $contribution_page_id
+         *
+         */
+        public function setupFormVariables()
+        {
+            /* Send Contribution Page ID to template */
+            $this->_form->assign('contributionPageID', $this->_pageID);
+
+        }
+
+
+        /**
          * @return array|null
          */
         function fetchContributionPage()
@@ -208,6 +212,7 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
                 ));
 
                 foreach ($result['values'] as $value) {
+                    $this->_values = $value;
                     $this->setAmountBlockActive(@$value['amount_block_is_active'])
                         ->setContributionIntroText(@$value['intro_text'])
                         ->setContributionTitle(@$value['title'])

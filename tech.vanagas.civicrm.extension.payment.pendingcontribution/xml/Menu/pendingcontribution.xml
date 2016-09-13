@@ -22,12 +22,12 @@
     <path>civicrm/payment-processor-form</path>
     <page_callback>CRM_Pendingcontribution_Form_PaymentProcessorForm</page_callback>
     <title>PaymentProcessorForm</title>
-    <access_arguments>access CiviCRM</access_arguments>
+    <access_arguments>make Payments</access_arguments>
   </item>
   <item>
-    <path>civicrm/payment-processor-live-form</path>
-    <page_callback>CRM_Pendingcontribution_Form_PaymentProcessorLiveForm</page_callback>
+    <path>civicrm/pending/payment-processor</path>
+    <page_callback>CRM_Pendingcontribution_Controller_PendingContribution</page_callback>
     <title>PaymentProcessorLiveForm</title>
-    <access_arguments>access CiviCRM</access_arguments>
+    <access_arguments>make contributions for pending payments</access_arguments>
   </item>
 </menu>

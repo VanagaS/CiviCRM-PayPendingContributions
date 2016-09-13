@@ -13,7 +13,6 @@ use \tech\vanagas\civicrm\extension\payment\pendingcontribution\ContributionPage
  *
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC43/QuickForm+Reference
  */
-//class CRM_Pendingcontribution_Form_PaymentProcessorForm extends CRM_Contribute_Form_Contribution_Main
 class CRM_Pendingcontribution_Form_PaymentProcessorForm extends CRM_Core_Form
 {
     /**

@@ -32,7 +32,7 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
         /**
          * The current status of the contribution ("Pending", "In Progress", "Overdue", "Partially paid", "Failed").
          *
-         * @var boolean
+         * @var integer
          */
         protected $_contributionStatus;
 
@@ -98,6 +98,20 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
          * @var array
          */
         protected $_recurringContributions;
+
+        /**
+         * Receive Date
+         *
+         * @var string
+         */
+        protected $_receiveDate;
+
+        /**
+         * Store the raw values as is
+         *
+         * @var array
+         */
+        protected $_values;
 
         /**
          * @return mixed
@@ -171,24 +185,6 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
         public function setContributionSource($contributionSource)
         {
             $this->_contributionSource = $contributionSource;
-            return $this;
-        }
-
-        /**
-         * @return boolean
-         */
-        public function isContributionStatus()
-        {
-            return $this->_contributionStatus;
-        }
-
-        /**
-         * @param boolean $constributionStatus
-         * @return Contribution
-         */
-        public function setContributionStatus($constributionStatus)
-        {
-            $this->_contributionStatus = $constributionStatus;
             return $this;
         }
 
@@ -335,5 +331,61 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
             $this->_currency = $currency;
             return $this;
         }
+
+        /**
+         * @return int
+         */
+        public function getContributionStatus()
+        {
+            return $this->_contributionStatus;
+        }
+
+        /**
+         * @param int $contributionStatus
+         * @return Contribution
+         */
+        public function setContributionStatus($contributionStatus)
+        {
+            $this->_contributionStatus = $contributionStatus;
+            return $this;
+        }
+
+        /**
+         * @return mixed
+         */
+        public function getReceiveDate()
+        {
+            return $this->_receiveDate;
+        }
+
+        /**
+         * @param mixed $receiveDate
+         * @return Contribution
+         */
+        public function setReceiveDate($receiveDate)
+        {
+            $this->_receiveDate = $receiveDate;
+            return $this;
+        }
+
+        /**
+         * @return array
+         */
+        public function getValues()
+        {
+            return $this->_values;
+        }
+
+        /**
+         * @param array $values
+         * @return Contribution
+         */
+        public function setValues($values)
+        {
+            $this->_values = $values;
+            return $this;
+        }
+
+
     }
 }

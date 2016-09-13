@@ -117,38 +117,16 @@ class CRM_Pendingcontribution_Form_PayPendingContributionsForm extends CRM_Core_
 
     public function buildQuickForm()
     {
-        parent::buildQuickForm();
-
         if(!is_null($this->_pendingContributions)) {
             /* Refresh for latest values */
             $this->_pendingContributions->setupFormVariables();
         }
+        //$this->assign('elementNames', $this->getRenderableElementNames());
+        parent::buildQuickForm();
     }
 
     public function postProcess()
     {
         parent::postProcess();
-    }
-
-    /**
-     * Get the fields/elements defined in this form.
-     *
-     * @return array (string)
-     */
-    public function getRenderableElementNames()
-    {
-        // The _elements list includes some items which should not be
-        // auto-rendered in the loop -- such as "qfKey" and "buttons".  These
-        // items don't have labels.  We'll identify renderable by filtering on
-        // the 'label'.
-        $elementNames = array();
-        foreach ($this->_elements as $element) {
-            /** @var HTML_QuickForm_Element $element */
-            $label = $element->getLabel();
-            if (!empty($label)) {
-                $elementNames[] = $element->getName();
-            }
-        }
-        return $elementNames;
     }
 }

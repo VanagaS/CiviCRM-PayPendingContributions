@@ -96,16 +96,18 @@
                     </tr>
                 {/if*}
                 <tr>
+                    {assign var="receive_date" value=$contrib->getReceiveDate()}
                     <td class="label">{ts}Received{/ts}</td>
                     <td>{if $receive_date}{$receive_date|crmDate}{else}({ts}not available{/ts}){/if}</td>
                 </tr>
-                {if $to_financial_account }
+                {*if $to_financial_account }
                     <tr>
                         <td class="label">{ts}Received Into{/ts}</td>
                         <td>{$to_financial_account}</td>
                     </tr>
-                {/if}
+                {/if*}
                 <tr>
+                    {assign var="contribution_status_id" value=$contrib->getContributionStatus()}
                     <td class="label">{ts}Contribution Status{/ts}</td>
                     <td {if $contribution_status_id eq 3} class="font-red bold"{/if}>{$contribution_status}
                         {if $contribution_status_id eq 2} {if $is_pay_later}: {ts}Pay Later{/ts} {else} : {ts}Incomplete Transaction{/ts} {/if}{/if}</td>

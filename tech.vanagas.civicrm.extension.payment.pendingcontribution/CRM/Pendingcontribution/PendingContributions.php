@@ -115,7 +115,7 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
             $this->_id = $session->getLoggedInContactID();
 
             /* Generate the results of the pending payments for the provided contribution id */
-            /* Contribution and ContributionPage objects get loaded by the end of this call */
+            /* Contribution and ContributionPage objects get loaded by the end of this call and _values will be set */
             $this->fetchContactsWithPendingPayments(); /* TODO Handle return value (errors) */
 
             /* Set the title for the displayed page */
@@ -138,10 +138,13 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
             /* Pass on the error message (PayPendingContributionsForm) to template */
             $this->_form->assign('ppcf_error_message', $this->_ppcfErrorMessage);
 
+
             if (!is_null($this->_selectedContribution)) {
                 /* Contribution Amount */
                 $this->_form->assign('contribution_amount', $this->_selectedContribution->getAmount());
+                $this->_form->addElement('hidden', 'amount_other', $this->_selectedContribution->getAmount());
                 $this->_form->assign('currency', $this->_selectedContribution->getCurrency());
+                $this->_form->addElement('hidden', 'currency', $this->_selectedContribution->getCurrency());
 
                 /* All all the imported Objects */
                 $this->_contributionPage->setupFormVariables();
@@ -216,8 +219,10 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
                     if ($count > 0) {
                         $this->_isPending = true;
 
-                        //$this->xdebug($result);
-                        /* populate the contribution object(s) with respective values */
+                        /**
+                         * populate Contribution and its Contribution Page object(s) with respective values,
+                         * _values will be set here as well
+                         */
                         $this->_contributions = $this->generateContributions($result);
 
                         /*
@@ -278,11 +283,14 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
                     ->setOwnerContactID($value['contact_id'])
                     ->setOwnerDisplayName($value['display_name'])
                     ->setContributionID($value['contribution_id'])
-                    ->setContributionPageID($value['contribution_page_id']);
+                    ->setContributionPageID($value['contribution_page_id'])
+                    ->setReceiveDate($value['receive_date'])
+                    ->setValues($value);
 
                 if($this->_contribution) {
                     /* A a contribution id is already specified, there will be only one result */
                     $this->_selectedContribution = $contribution;
+                    /* _values will be set here in this call, while fetching Contribution Page of given contribution */
                     $this->_contributionPage = new ContributionPage($contribution->getContributionPageID(), $this->_form);
                 }
 

@@ -24,4 +24,10 @@
     <title>PaymentProcessorForm</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/payment-processor-live-form</path>
+    <page_callback>CRM_Pendingcontribution_Form_PaymentProcessorLiveForm</page_callback>
+    <title>PaymentProcessorLiveForm</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>

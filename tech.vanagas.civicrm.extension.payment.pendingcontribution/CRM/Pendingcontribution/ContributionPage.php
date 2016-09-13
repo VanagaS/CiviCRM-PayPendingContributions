@@ -196,7 +196,6 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
         {
             /* Send Contribution Page ID to template */
             $this->_form->assign('contributionPageID', $this->_pageID);
-
         }
 
 

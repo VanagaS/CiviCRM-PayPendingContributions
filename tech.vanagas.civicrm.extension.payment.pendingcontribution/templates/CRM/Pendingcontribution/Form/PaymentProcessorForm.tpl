@@ -20,7 +20,17 @@
         </div>
         <div class="clear"></div>
     </div>
-
+    {if $form.payment_processor_id.label}
+        {* PP selection only works with JS enabled, so we hide it initially *}
+        <fieldset class="crm-public-form-item crm-group payment_options-group" style="display:none;">
+            <legend>{ts}Payment Options{/ts}</legend>
+            <div class="crm-public-form-item crm-section payment_processor-section">
+                <div class="label">{$form.payment_processor_id.label}</div>
+                <div class="content">{$form.payment_processor_id.html}</div>
+                <div class="clear"></div>
+            </div>
+        </fieldset>
+    {/if}
     <div id="billing-payment-block">
         {include file="CRM/Financial/Form/Payment.tpl" snippet=4}
     </div>

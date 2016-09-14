@@ -1,7 +1,6 @@
 <?php
 
 require_once 'CRM/Core/Form.php';
-require_once 'CRM/Core/Payment/Form.php';
 require_once 'CRM/Pendingcontribution/PendingContributions.php';
 require_once 'CRM/Pendingcontribution/ContributionPage.php';
 
@@ -58,6 +57,7 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Base extends CRM_Core_Form
             $contribution_id = $this->get('contribution_id');
         }
 
+        $this->_bltID = $this->get('bltID');
         /* get the reference to session object */
         $session = CRM_Core_Session::singleton();
         /* generate default URL for this module and set the context in session */
@@ -124,6 +124,124 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Base extends CRM_Core_Form
 
     public function buildQuickExt() {
         /* */
+    }
+
+    /**
+     * Add the custom fields.
+     *
+     * @param int $id
+     * @param string $name
+     * @param bool $viewOnly
+     * @param null $profileContactType
+     * @param array $fieldTypes
+     */
+    public function buildCustom($id, $name, $viewOnly = FALSE, $profileContactType = NULL, $fieldTypes = NULL) {
+        if ($id) {
+            $contactID = $this->getContactID();
+
+            // we don't allow conflicting fields to be
+            // configured via profile - CRM 2100
+            $fieldsToIgnore = array(
+                'receive_date' => 1,
+                'trxn_id' => 1,
+                'invoice_id' => 1,
+                'net_amount' => 1,
+                'fee_amount' => 1,
+                'non_deductible_amount' => 1,
+                'total_amount' => 1,
+                'amount_level' => 1,
+                'contribution_status_id' => 1,
+                'payment_instrument' => 1,
+                'check_number' => 1,
+                'financial_type' => 1,
+            );
+
+            $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD, NULL, NULL, FALSE,
+                NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL
+            );
+
+            if ($fields) {
+                // unset any email-* fields since we already collect it, CRM-2888
+                foreach (array_keys($fields) as $fieldName) {
+                    if (substr($fieldName, 0, 6) == 'email-' && !in_array($profileContactType, array('honor', 'onbehalf'))) {
+                        unset($fields[$fieldName]);
+                    }
+                }
+
+                if (array_intersect_key($fields, $fieldsToIgnore)) {
+                    $fields = array_diff_key($fields, $fieldsToIgnore);
+                    CRM_Core_Session::setStatus(ts('Some of the profile fields cannot be configured for this page.'), ts('Warning'), 'alert');
+                }
+
+                $fields = array_diff_assoc($fields, $this->_fields);
+
+                CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
+                $addCaptcha = FALSE;
+                foreach ($fields as $key => $field) {
+                    if ($viewOnly &&
+                        isset($field['data_type']) &&
+                        $field['data_type'] == 'File' || ($viewOnly && $field['name'] == 'image_URL')
+                    ) {
+                        // ignore file upload fields
+                        continue;
+                    }
+
+                    if ($profileContactType) {
+                        //Since we are showing honoree name separately so we are removing it from honoree profile just for display
+                        if ($profileContactType == 'honor') {
+                            $honoreeNamefields = array(
+                                'prefix_id',
+                                'first_name',
+                                'last_name',
+                                'suffix_id',
+                                'organization_name',
+                                'household_name',
+                            );
+                            if (in_array($field['name'], $honoreeNamefields)) {
+                                unset($fields[$field['name']]);
+                                continue;
+                            }
+                        }
+                        if (!empty($fieldTypes) && in_array($field['field_type'], $fieldTypes)) {
+                            CRM_Core_BAO_UFGroup::buildProfile(
+                                $this,
+                                $field,
+                                CRM_Profile_Form::MODE_CREATE,
+                                $contactID,
+                                TRUE,
+                                $profileContactType
+                            );
+                            $this->_fields[$profileContactType][$key] = $field;
+                        }
+                        else {
+                            unset($fields[$key]);
+                        }
+                    }
+                    else {
+                        CRM_Core_BAO_UFGroup::buildProfile(
+                            $this,
+                            $field,
+                            CRM_Profile_Form::MODE_CREATE,
+                            $contactID,
+                            TRUE
+                        );
+                        $this->_fields[$key] = $field;
+                    }
+                    // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
+                    if ($field['add_captcha'] && !$this->_userID) {
+                        $addCaptcha = TRUE;
+                    }
+                }
+
+                $this->assign($name, $fields);
+
+                if ($addCaptcha && !$viewOnly) {
+                    $captcha = CRM_Utils_ReCAPTCHA::singleton();
+                    $captcha->add($this);
+                    $this->assign('isCaptcha', TRUE);
+                }
+            }
+        }
     }
 
     /**

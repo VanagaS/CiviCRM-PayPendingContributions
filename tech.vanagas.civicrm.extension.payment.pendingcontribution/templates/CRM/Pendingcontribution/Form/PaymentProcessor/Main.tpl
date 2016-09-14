@@ -20,6 +20,14 @@
     </div>
     <div class="clear"></div>
   </div>
+  {assign var=n value=email-$bltID}
+  <div class="crm-public-form-item crm-section {$form.$n.name}-section">
+    <div class="label">{$form.$n.label}</div>
+    <div class="content">
+      {$form.$n.html}
+    </div>
+    <div class="clear"></div>
+  </div>
   {if $form.payment_processor_id.label}
     {* PP selection only works with JS enabled, so we hide it initially *}
     <fieldset class="crm-public-form-item crm-group payment_options-group" style="display:none;">

@@ -18,7 +18,7 @@ class CRM_Pendingcontribution_StateMachine_PendingContribution extends CRM_Core_
     parent::__construct($controller, $action);
 
     $this->_pages = array(
-      'CRM_Pendingcontribution_Form_PaymentProcessorLiveForm' => NULL,
+      'CRM_Pendingcontribution_Form_PaymentProcessor_Main' => NULL,
       'CRM_Pendingcontribution_Form_PaymentProcessor_Confirm' => NULL,
       'CRM_Pendingcontribution_Form_PaymentProcessor_ThankYou' => NULL,
     );

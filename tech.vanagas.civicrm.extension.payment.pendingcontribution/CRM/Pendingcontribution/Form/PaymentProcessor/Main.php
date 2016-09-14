@@ -1,7 +1,7 @@
 <?php
 
 require_once 'CRM/Core/Form.php';
-require_once 'CRM/Pendingcontribution/Form/PaymentProcessorBase.php';
+require_once 'CRM/Pendingcontribution/Form/PaymentProcessor/Base.php';
 require_once 'CRM/Pendingcontribution/PendingContributions.php';
 require_once 'CRM/Pendingcontribution/ContributionPage.php';
 
@@ -13,11 +13,11 @@ use \tech\vanagas\civicrm\extension\payment\pendingcontribution\ContributionPage
  *
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC43/QuickForm+Reference
  */
-class CRM_Pendingcontribution_Form_PaymentProcessorLiveForm extends CRM_Pendingcontribution_Form_PaymentProcessor_Base
+class CRM_Pendingcontribution_Form_PaymentProcessor_Main extends CRM_Pendingcontribution_Form_PaymentProcessor_Base
 {
 
     /**
-     * CRM_Pendingcontribution_Form_PaymentProcessorLiveForm constructor.
+     * CRM_Pendingcontribution_Form_PaymentProcessor_Main constructor.
      */
     public function __construct()
     {
@@ -40,6 +40,12 @@ class CRM_Pendingcontribution_Form_PaymentProcessorLiveForm extends CRM_Pendingc
 
     public function buildQuickFormExt()
     {
+        $this->add('text', "email-{$this->_bltID}",
+            ts('Email Address'),
+            array('size' => 30, 'maxlength' => 60, 'class' => 'email'),
+            TRUE
+        );
+        $this->addRule("email-{$this->_bltID}", ts('Email is not valid.'), 'email');
         /**
          * If the selected contribution's Contribution page is inactive, this means that its no longer accepting
          * contributions, lets throw error.
@@ -91,7 +97,7 @@ class CRM_Pendingcontribution_Form_PaymentProcessorLiveForm extends CRM_Pendingc
      */
     public function addRules()
     {
-        $this->addFormRule(array('CRM_PendingContribution_Form_PaymentProcessorLiveForm', 'formRule'), $this);
+        $this->addFormRule(array('CRM_PendingContribution_Form_PaymentProcessor_Main', 'formRule'), $this);
     }
 
     /**
@@ -237,7 +243,7 @@ class CRM_Pendingcontribution_Form_PaymentProcessorLiveForm extends CRM_Pendingc
     public function testSubmit($params)
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $this->controller = new CRM_Pendingcontribution_Form_PaymentProcessorLiveForm();
+        $this->controller = new CRM_Pendingcontribution_Form_PaymentProcessor_Main();
         $this->submit($params);
     }
 }

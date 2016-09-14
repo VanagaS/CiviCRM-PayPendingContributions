@@ -30,6 +30,9 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Main extends CRM_Pendingcont
      */
     public function preProcess()
     {
+        /* retrieve the value of parameter 'contribution' from URL */
+        $this->_mode = CRM_Utils_Request::retrieve('action', 'Positive');
+
         parent::preProcess();
     }
 

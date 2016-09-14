@@ -33,6 +33,11 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Base extends CRM_Core_Form
     public $_values;
 
     /**
+     * @var integer
+     */
+    public $_mode;
+
+    /**
      * CRM_Pendingcontribution_Form_PaymentProcessor_Base constructor.
      */
     public function __construct()
@@ -46,6 +51,8 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Base extends CRM_Core_Form
      */
     public function preProcess()
     {
+        xdebug_var_dump("Hello");
+        exit;
         parent::preProcess();
 
         /* retrieve the value of parameter 'contribution' from URL */
@@ -55,6 +62,9 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Base extends CRM_Core_Form
             $this->set('contribution_id', $contribution_id);
         } else {
             $contribution_id = $this->get('contribution_id');
+        }
+        if(!$contribution_id) {
+            CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/pay-pending-contributions-form', 'reset=1'));
         }
 
         $this->_bltID = $this->get('bltID');
@@ -76,6 +86,17 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Base extends CRM_Core_Form
             $this->setupPaymentProcess();
 
         }
+        /* Set the defaluts *FIXME* Hardcoding for now as this is confirmed to be payment mode */
+        $this->_contributeMode = 'direct';
+        $this->assign('contributeMode', $this->_contributeMode);
+        $this->assign('is_monetary', true);
+        $this->_mode = ($this->_action == 1024) ? 'test' : 'live';
+        $this->set('mode', $this->_mode);
+        if (isset($this->_params)) {
+            $this->_amount = $this->_params['amount_other'];
+        }
+        $this->_id = $this->_values['id'];
+
     }
 
     public function setupPaymentProcess()
@@ -123,6 +144,10 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Base extends CRM_Core_Form
     }
 
     public function buildQuickExt() {
+        /* */
+    }
+
+    public function buildQuickFormExt() {
         /* */
     }
 

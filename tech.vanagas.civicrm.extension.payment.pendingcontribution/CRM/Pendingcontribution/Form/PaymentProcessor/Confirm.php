@@ -92,10 +92,6 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Confirm extends CRM_Pendingc
 
     public function buildQuickFormExt()
     {
-        echo "<pre>";
-        debug_print_backtrace();
-        echo "</pre>";
-
         $this->assignToTemplate();
 
         $params = $this->_params;

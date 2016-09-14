@@ -1,7 +1,7 @@
 <?php
 
 require_once 'CRM/Core/Form.php';
-require_once 'CRM/Pendingcontribution/Form/PaymentProcessorBase.php';
+require_once 'CRM/Pendingcontribution/Form/PaymentProcessor/Base.php';
 require_once 'CRM/Pendingcontribution/PendingContributions.php';
 require_once 'CRM/Pendingcontribution/ContributionPage.php';
 
@@ -17,7 +17,7 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_ThankYou extends CRM_Pending
 {
 
     /**
-     * CRM_Pendingcontribution_Form_PaymentProcessorLiveForm constructor.
+     * CRM_Pendingcontribution_Form_PaymentProcessor_ThankYou constructor.
      */
     public function __construct()
     {
@@ -91,7 +91,7 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_ThankYou extends CRM_Pending
      */
     public function addRules()
     {
-        $this->addFormRule(array('CRM_PendingContribution_Form_PaymentProcessorLiveForm', 'formRule'), $this);
+        $this->addFormRule(array('CRM_PendingContribution_Form_PaymentProcessor_ThankYou', 'formRule'), $this);
     }
 
     /**
@@ -237,7 +237,7 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_ThankYou extends CRM_Pending
     public function testSubmit($params)
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $this->controller = new CRM_Pendingcontribution_Form_PaymentProcessorLiveForm();
+        $this->controller = new CRM_Pendingcontribution_Form_PaymentProcessor_ThankYou();
         $this->submit($params);
     }
 }

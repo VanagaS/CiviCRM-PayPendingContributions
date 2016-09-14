@@ -27,7 +27,7 @@
   <item>
     <path>civicrm/pending/payment-processor</path>
     <page_callback>CRM_Pendingcontribution_Controller_PendingContribution</page_callback>
-    <title>PaymentProcessorLiveForm</title>
+    <title>PaymentProcessorMain</title>
     <access_arguments>make contributions for pending payments</access_arguments>
   </item>
 </menu>

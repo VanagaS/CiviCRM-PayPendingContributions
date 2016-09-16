@@ -101,7 +101,7 @@ class CRM_Pendingcontribution_Form_PayPendingContributionsForm extends CRM_Core_
 
         /* Generate the results of the pending payments for the provided contribution id */
         /* Contribution and ContributionPage objects get loaded by the end of this call */
-        $this->_pendingContributions = new PendingContributions($this->_contribution, $this); /* TODO Handle return value (errors) */
+        $this->_pendingContributions = new PendingContributions($this->_contribution, $this, TRUE); /* TODO Handle return value (errors) */
 
         /* let the parent take over with any of its defaults */
         parent::preProcess();

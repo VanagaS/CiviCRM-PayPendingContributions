@@ -176,17 +176,27 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
          */
         protected $_values;
 
+
         /**
          * ContributionPage constructor.
-         * @param int $_pageID
+         * @param $_pageID
+         * @param $form
+         * @param null $listPage
          */
-        public function __construct($_pageID, &$form)
+        public function __construct($_pageID, &$form, $listPage = null)
         {
             $this->_pageID = $_pageID;
-            $this->_form = &$form;
+
             $this->fetchContributionPage();
-            /* Assign the raw object to the form */
-            $this->_form->_values = $this->_values;
+            $this->_form = &$form;
+
+            /** Assign the raw object to the form
+             * FIXME: Need to remove this to save memory, once we transfer all required properties of this->_values to Object properties
+             * If listPage is null, which is default, assign the values, otherwise, save memory
+             */
+            if(is_null($listPage)) {
+                $this->_form->_values = $this->_values;
+            }
         }
 
         /**
@@ -196,6 +206,7 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
         {
             /* Send Contribution Page ID to template */
             $this->_form->assign('contributionPageID', $this->_pageID);
+            $this->_form->assign('contribution_page_title', $this->_contributionTitle);
         }
 
 

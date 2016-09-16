@@ -40,7 +40,7 @@
     </fieldset>
   {/if}
   <div id="billing-payment-block">
-    {include file="CRM/Financial/Form/Payment.tpl" snippet=4}
+      {include file="CRM/Core/BillingBlock.tpl" snippet=4}
   </div>
 
   <div id="crm-submit-buttons" class="crm-submit-buttons">

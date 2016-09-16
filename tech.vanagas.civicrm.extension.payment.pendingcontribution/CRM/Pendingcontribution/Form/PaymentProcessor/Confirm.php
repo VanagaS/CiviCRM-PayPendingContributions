@@ -95,7 +95,7 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Confirm extends CRM_Pendingc
         $amount_block_is_active = $this->get('amount_block_is_active');
         $this->assign('amount_block_is_active', $amount_block_is_active);
 
-        $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
+        $invoiceSettings = CRM_Pendingcontribution_VersionCompatibility::getInvoiceSettings('contribution_invoice_settings');
         $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
         if ($invoicing) {
             $getTaxDetails = FALSE;
@@ -243,12 +243,12 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Confirm extends CRM_Pendingc
         }
 
 
-                $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $this->_params));
-                $date = CRM_Utils_Date::mysqlToIso($date);
-                $this->assign('credit_card_exp_date', $date);
-                $this->assign('credit_card_number',
-                    CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $this->_params))
-                );
+        $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $this->_params));
+        $date = CRM_Utils_Date::mysqlToIso($date);
+        $this->assign('credit_card_exp_date', $date);
+        $this->assign('credit_card_number',
+            CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $this->_params))
+        );
 
 
         $this->assign('email',
@@ -699,7 +699,8 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Confirm extends CRM_Pendingc
                 }
             }
 
-            $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($this, $paymentParams,
+//            $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($this, $paymentParams,
+            $result = CRM_Pendingcontribution_VersionCompatibility::processConfirm($this, $paymentParams,
                 $contactID,
                 $this->wrangleFinancialTypeID($this->_values['financial_type_id']),
                 'contribution',
@@ -901,6 +902,45 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Confirm extends CRM_Pendingc
     }
 
     /**
+     * Format the fields for the payment processor.
+     *
+     * In order to pass fields to the payment processor in a consistent way we add some renamed
+     * parameters.
+     *
+     * @param array $fields
+     *
+     * @return array
+     */
+    protected function formatParamsForPaymentProcessor($fields) {
+        // also add location name to the array
+        $this->_params["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $this->_params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $this->_params) . ' ' . CRM_Utils_Array::value('billing_last_name', $this->_params);
+        $this->_params["address_name-{$this->_bltID}"] = trim($this->_params["address_name-{$this->_bltID}"]);
+        // Add additional parameters that the payment processors are used to receiving.
+        if (!empty($this->_params["billing_state_province_id-{$this->_bltID}"])) {
+            $this->_params['state_province'] = $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
+        }
+        if (!empty($this->_params["billing_country_id-{$this->_bltID}"])) {
+            $this->_params['country'] = $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
+        }
+
+        list($hasAddressField, $addressParams) =
+            CRM_Pendingcontribution_VersionCompatibility::getPaymentProcessorReadyAddressParams($this->_params, $this->_bltID);
+        if ($hasAddressField) {
+            $this->_params = array_merge($this->_params, $addressParams);
+        }
+
+        $nameFields = array('first_name', 'middle_name', 'last_name');
+        foreach ($nameFields as $name) {
+            $fields[$name] = 1;
+            if (array_key_exists("billing_$name", $this->_params)) {
+                $this->_params[$name] = $this->_params["billing_{$name}"];
+                $this->_params['preserveDBName'] = TRUE;
+            }
+        }
+        return $fields;
+    }
+
+    /**
      * Function for unit tests on the postProcess function.
      *
      * @param array $params
@@ -911,4 +951,5 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Confirm extends CRM_Pendingc
         $this->controller = new CRM_Pendingcontribution_Form_PaymentProcessor_Confirm();
         $this->submit($params);
     }
+
 }

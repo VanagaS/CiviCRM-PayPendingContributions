@@ -85,7 +85,7 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Main extends CRM_Pendingcont
         $this->set('paymentProcessor', $this->_paymentProcessor);
 
         CRM_Core_Payment_ProcessorForm::preProcess($this);
-        CRM_Financial_Form_Payment::addCreditCardJs();
+        CRM_Pendingcontribution_VersionCompatibility::addCreditCardJs();
 
         if (!empty($this->_paymentProcessor)) {
             $this->_defaults['payment_processor_id'] = $this->_paymentProcessor;
@@ -151,11 +151,12 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Main extends CRM_Pendingcont
 
         // get the submitted form values.
         $params = $this->controller->exportValues($this->_name);
+
         $this->submit($params);
         if (empty($this->_values['is_confirm_enabled'])) {
             $this->skipToThankYouPage();
         }
-        
+
     }
 
     /**
@@ -168,7 +169,7 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Main extends CRM_Pendingcont
      */
     public function submit($params)
     {
-       $params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
+        $params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
         // from here on down, $params['amount'] holds a monetary value (or null) rather than an option ID
         $params['amount'] = CRM_Contribute_Form_Contribution_Main::computeAmount($params, $this->_values);

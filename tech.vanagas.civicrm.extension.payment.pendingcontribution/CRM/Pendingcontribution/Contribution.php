@@ -32,9 +32,16 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
         /**
          * The current status of the contribution ("Pending", "In Progress", "Overdue", "Partially paid", "Failed").
          *
-         * @var integer
+         * @var string
          */
         protected $_contributionStatus;
+
+        /**
+         * The Id of current status of the contribution ("Pending", "In Progress", "Overdue", "Partially paid", "Failed").
+         *
+         * @var integer
+         */
+        protected $_contributionStatusID;
 
         /**
          * Is this a Pledge?
@@ -86,6 +93,13 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
         protected $_contributionPageID;
 
         /**
+         * Contribution Page
+         *
+         * @var object
+         */
+        protected $_contributionPage;
+
+        /**
          * Currency of the contribution
          *
          * @var string
@@ -112,6 +126,20 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
          * @var array
          */
         protected $_values;
+
+        /**
+         * Payment Instrument (cheque, cc, bank)
+         *
+         * @var string
+         */
+        protected $_paymentInstrument;
+
+        /**
+         * If Payment is via Cheque, then we need cheque number
+         *
+         * @var string
+         */
+        protected $_paymentInstrumentNumber;
 
         /**
          * @return mixed
@@ -333,24 +361,6 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
         }
 
         /**
-         * @return int
-         */
-        public function getContributionStatus()
-        {
-            return $this->_contributionStatus;
-        }
-
-        /**
-         * @param int $contributionStatus
-         * @return Contribution
-         */
-        public function setContributionStatus($contributionStatus)
-        {
-            $this->_contributionStatus = $contributionStatus;
-            return $this;
-        }
-
-        /**
          * @return mixed
          */
         public function getReceiveDate()
@@ -386,6 +396,95 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
             return $this;
         }
 
+        /**
+         * @return string
+         */
+        public function getContributionStatus()
+        {
+            return $this->_contributionStatus;
+        }
+
+        /**
+         * @param string $contributionStatus
+         * @return Contribution
+         */
+        public function setContributionStatus($contributionStatus)
+        {
+            $this->_contributionStatus = $contributionStatus;
+            return $this;
+        }
+
+        /**
+         * @return int
+         */
+        public function getContributionStatusID()
+        {
+            return $this->_contributionStatusID;
+        }
+
+        /**
+         * @param int $contributionStatusID
+         * @return Contribution
+         */
+        public function setContributionStatusID($contributionStatusID)
+        {
+            $this->_contributionStatusID = $contributionStatusID;
+            return $this;
+        }
+
+        /**
+         * @return string
+         */
+        public function getPaymentInstrument()
+        {
+            return $this->_paymentInstrument;
+        }
+
+        /**
+         * @param string $paymentInstrument
+         * @return Contribution
+         */
+        public function setPaymentInstrument($paymentInstrument)
+        {
+            $this->_paymentInstrument = $paymentInstrument;
+            return $this;
+        }
+
+        /**
+         * @return object
+         */
+        public function getContributionPage()
+        {
+            return $this->_contributionPage;
+        }
+
+        /**
+         * @param object $contributionPage
+         * @return Contribution
+         */
+        public function setContributionPage($contributionPage)
+        {
+            $this->_contributionPage = $contributionPage;
+            return $this;
+        }
+
+        /**
+         * @return string
+         */
+        public function getPaymentInstrumentNumber()
+        {
+            return $this->_paymentInstrumentNumber;
+        }
+
+        /**
+         * @param string $paymentInstrumentNumber
+         * @return Contribution
+         */
+        public function setPaymentInstrumentNumber($paymentInstrumentNumber)
+        {
+            $this->_paymentInstrumentNumber = $paymentInstrumentNumber;
+            return $this;
+        }
 
     }
 }

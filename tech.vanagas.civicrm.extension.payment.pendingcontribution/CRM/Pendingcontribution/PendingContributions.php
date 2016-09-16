@@ -97,16 +97,26 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
         protected $_form;
 
         /**
+         * Whether to fetch ContributionPage and attach to Contribution Object.
+         * To save memory, we will only do this, when the request specifically comes with
+         * listPage as true (this will be from pay-pending-contributions-form).
+         *
+         * @var boolean
+         */
+        protected $_listPage;
+
+        /**
          * Set variables up before form is built.
          */
-        public function __construct($contributionid, &$form)
+        public function __construct($contributionid, &$form, $listPage = null)
         {
 
             /* set the form for assiging variables directly to template */
             $this->_form = &$form;
             /* set the selected contribution ID */
             $this->_contribution = $contributionid;
-
+            /* assign the list page requirement */
+            $this->_listPage = $listPage;
 
             /* get the reference to session object */
             $session = \CRM_Core_Session::singleton();
@@ -137,6 +147,8 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
             $this->_form->assign('ppcf_error_status', $this->_isPPCFError);
             /* Pass on the error message (PayPendingContributionsForm) to template */
             $this->_form->assign('ppcf_error_message', $this->_ppcfErrorMessage);
+            global $user;
+            $this->_form->assign('display_name', $user->name);
 
 
             if (!is_null($this->_selectedContribution)) {
@@ -185,7 +197,8 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
                 'contribution_page_id' => array('IS NOT NULL' => 1),
                 'contribution_status_id' =>
                     array('IN' =>
-                        array("Pending", "In Progress", "Overdue", "Partially paid", "Failed")),
+                        array("Pending")),
+                //array("Pending", "In Progress", "Overdue", "Partially paid", "Failed")),
                 //'return' => array("*"),
             );
 
@@ -204,7 +217,6 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
 
             try {
                 $result = \civicrm_api3('Contribution', 'get', $params);
-
                 /* Check whether we have any entries that needs to be fulfilled */
                 if (!$result['is_error']) { // API call is successful and has no errors
                     $count = $result['count']; // Number of contributions to be paid (member variable required?)
@@ -277,6 +289,7 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
                     ->setFinancialType($value['financial_type'])
                     ->setContributionSource($value['contribution_source'])
                     ->setContributionStatus($value['contribution_status'])
+                    ->setContributionStatusID($value['contribution_status_id'])
                     ->setIsRecurring($value['contribution_recur_id'])
                     ->setCurrency($value['currency'])
                     ->setIsPayLater(($value['is_pay_later']))
@@ -285,8 +298,13 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
                     ->setContributionID($value['contribution_id'])
                     ->setContributionPageID($value['contribution_page_id'])
                     ->setReceiveDate($value['receive_date'])
+                    ->setPaymentInstrument($value['payment_instrument'])
+                    ->setPaymentInstrumentNumber($value['contribution_check_number'])
                     ->setValues($value);
 
+                if($this->_listPage) {
+                    $contribution->setContributionPage(new ContributionPage($value['contribution_page_id'], $this->_form, $this->_listPage));
+                }
                 if($this->_contribution) {
                     /* A a contribution id is already specified, there will be only one result */
                     $this->_selectedContribution = $contribution;

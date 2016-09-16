@@ -24,7 +24,8 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_ThankYou extends CRM_Pending
     /**
      * Set variables up before form is built.
      */
-    public function preProcess() {
+    public function preProcess()
+    {
         parent::preProcess();
 
         $this->_params = $this->get('params');
@@ -55,11 +56,11 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_ThankYou extends CRM_Pending
      *
      * @return int
      */
-    public function getAction() {
+    public function getAction()
+    {
         if ($this->_action & CRM_Core_Action::PREVIEW) {
             return CRM_Core_Action::VIEW | CRM_Core_Action::PREVIEW;
-        }
-        else {
+        } else {
             return CRM_Core_Action::VIEW;
         }
     }
@@ -67,7 +68,8 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_ThankYou extends CRM_Pending
     /**
      * Build the form object.
      */
-    public function buildQuickForm() {
+    public function buildQuickForm()
+    {
         parent::buildQuickForm();
         $this->_amount = $this->_params['amount_other'];
         $this->assignToTemplate();
@@ -82,7 +84,7 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_ThankYou extends CRM_Pending
         $this->assign('useForMember', $this->get('useForMember'));
 
         $params = $this->_params;
-        $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
+        $invoiceSettings = CRM_Pendingcontribution_VersionCompatibility::getInvoiceSettings('contribution_invoice_settings');
         $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
         if ($invoicing) {
             $getTaxDetails = FALSE;
@@ -161,8 +163,7 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_ThankYou extends CRM_Pending
                     if (isset($contact[$timeField])) {
                         $defaults[$timeField] = $contact[$timeField];
                     }
-                }
-                elseif (in_array($name, array(
+                } elseif (in_array($name, array(
                         'addressee',
                         'email_greeting',
                         'postal_greeting',
@@ -181,23 +182,24 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_ThankYou extends CRM_Pending
         $values['entity_table'] = 'civicrm_contribution_page';
 
         CRM_Friend_BAO_Friend::retrieve($values, $data);
+        if (!empty($data['title'])) {
             $friendText = $data['title'];
             $this->assign('friendText', $friendText);
             $subUrl = "eid={$this->_id}&pcomponent=contribute";
             $tellAFriend = TRUE;
 
-        if ($tellAFriend) {
-            if ($this->_action & CRM_Core_Action::PREVIEW) {
-                $url = CRM_Utils_System::url("civicrm/friend",
-                    "reset=1&action=preview&{$subUrl}"
-                );
+            if ($tellAFriend) {
+                if ($this->_action & CRM_Core_Action::PREVIEW) {
+                    $url = CRM_Utils_System::url("civicrm/friend",
+                        "reset=1&action=preview&{$subUrl}"
+                    );
+                } else {
+                    $url = CRM_Utils_System::url("civicrm/friend",
+                        "reset=1&{$subUrl}"
+                    );
+                }
+                $this->assign('friendURL', $url);
             }
-            else {
-                $url = CRM_Utils_System::url("civicrm/friend",
-                    "reset=1&{$subUrl}"
-                );
-            }
-            $this->assign('friendURL', $url);
         }
 
         $this->freeze();
@@ -210,7 +212,8 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_ThankYou extends CRM_Pending
     /**
      * Assign the minimal set of variables to the template.
      */
-    public function assignToTemplate() {
+    public function assignToTemplate()
+    {
         $name = CRM_Utils_Array::value('billing_first_name', $this->_params);
         if (!empty($this->_params['billing_middle_name'])) {
             $name .= " {$this->_params['billing_middle_name']}";
@@ -297,8 +300,7 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_ThankYou extends CRM_Pending
         $assignCCInfo = FALSE;
         if ($this->_amount > 0.0) {
             $assignCCInfo = TRUE;
-        }
-        elseif (!empty($this->_params['selectMembership'])) {
+        } elseif (!empty($this->_params['selectMembership'])) {
             $memFee = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_params['selectMembership'], 'minimum_fee');
             if ($memFee > 0.0) {
                 $assignCCInfo = TRUE;
@@ -315,8 +317,7 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_ThankYou extends CRM_Pending
                 $this->assign('bank_identification_number', $this->_params['bank_identification_number']);
                 $this->assign('bank_name', $this->_params['bank_name']);
                 $this->assign('bank_account_number', $this->_params['bank_account_number']);
-            }
-            else {
+            } else {
                 $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $this->_params));
                 $date = CRM_Utils_Date::mysqlToIso($date);
                 $this->assign('credit_card_exp_date', $date);

@@ -1,4 +1,3 @@
-<h1>Routed to and in Confirm Callback Page</h1>
 {if $action & 1024}
     {include file="CRM/Contribute/Form/Contribution/PreviewHeader.tpl"}
 {/if}

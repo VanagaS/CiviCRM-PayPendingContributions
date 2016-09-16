@@ -51,10 +51,7 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Base extends CRM_Core_Form
      */
     public function preProcess()
     {
-        xdebug_var_dump("Hello");
-        exit;
         parent::preProcess();
-
         /* retrieve the value of parameter 'contribution' from URL */
         $contribution_id = CRM_Utils_Request::retrieve('contribution', 'Positive');
 
@@ -86,6 +83,7 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Base extends CRM_Core_Form
             $this->setupPaymentProcess();
 
         }
+
         /* Set the defaluts *FIXME* Hardcoding for now as this is confirmed to be payment mode */
         $this->_contributeMode = 'direct';
         $this->assign('contributeMode', $this->_contributeMode);
@@ -101,26 +99,33 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Base extends CRM_Core_Form
 
     public function setupPaymentProcess()
     {
+
         /* Setup and initialize payment system */
         $this->_paymentProcessors = $this->get('paymentProcessors');
 
         /* Get the payment processor id registered with the selected contribution type */
         $this->_paymentProcessorID = $paymentProcessor_id = $this->_values['payment_processor'];
+
+        /* hard code payment processor ID if none exists, since we have to collect the payment anyway */
+        if(!$this->_paymentProcessorID) {
+            $this->_paymentProcessorID = $paymentProcessor_id = 1;
+        }
         /* Fetch the payment processor by id */
-        $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessor_id);
+        $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessor_id, $this->_mode);
         if (empty($this->_paymentProcessors)) {
             $this->_paymentProcessors[] = $this->_paymentProcessor;
             $this->set('paymentProcessors', $this->_paymentProcessors);
         }
+
         $this->assignBillingType();
         // $this->preProcessPaymentOptions();
-
         /* Setup payment fields */
         CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor);
-        /* Build Payment form */
-        CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE);
 
-        CRM_Financial_Form_Payment::addCreditCardJs();
+        /* Build Payment form */
+        CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, TRUE, TRUE);
+
+        CRM_Pendingcontribution_VersionCompatibility::addCreditCardJs();
         $this->assign('paymentProcessorID', $this->_paymentProcessorID);
         $this->assign('billing_profile_id', (CRM_Utils_Array::value('is_billing_required', $this->_values) ? 'billing' : ''));
     }
@@ -149,6 +154,22 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Base extends CRM_Core_Form
 
     public function buildQuickFormExt() {
         /* */
+    }
+
+    /**
+     * Assign billing type id to bltID.
+     *
+     * @throws CRM_Core_Exception
+     * @return void
+     */
+    public function assignBillingType() {
+        $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
+        $this->_bltID = array_search('Billing', $locationTypes);
+        if (!$this->_bltID) {
+            throw new CRM_Core_Exception(ts('Please set a location type of %1', array(1 => 'Billing')));
+        }
+        $this->set('bltID', $this->_bltID);
+        $this->assign('bltID', $this->_bltID);
     }
 
     /**

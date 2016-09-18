@@ -478,85 +478,13 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Confirm extends CRM_Pendingc
         // billing email address
         $fields["email-{$this->_bltID}"] = 1;
 
-        // if onbehalf-of-organization contribution, take out
-        // organization params in a separate variable, to make sure
-        // normal behavior is continued. And use that variable to
-        // process on-behalf-of functionality.
-        if (!empty($this->_values['onbehalf_profile_id'])) {
-            $behalfOrganization = array();
-            $orgFields = array('organization_name', 'organization_id', 'org_option');
-            foreach ($orgFields as $fld) {
-                if (array_key_exists($fld, $params)) {
-                    $behalfOrganization[$fld] = $params[$fld];
-                    unset($params[$fld]);
-                }
-            }
-
-            if (is_array($params['onbehalf']) && !empty($params['onbehalf'])) {
-                foreach ($params['onbehalf'] as $fld => $values) {
-                    if (strstr($fld, 'custom_')) {
-                        $behalfOrganization[$fld] = $values;
-                    } elseif (!(strstr($fld, '-'))) {
-                        if (in_array($fld, array(
-                            'contribution_campaign_id',
-                            'member_campaign_id',
-                        ))) {
-                            $fld = 'campaign_id';
-                        } else {
-                            $behalfOrganization[$fld] = $values;
-                        }
-                        $this->_params[$fld] = $values;
-                    }
-                }
-            }
-
-            if (array_key_exists('onbehalf_location', $params) && is_array($params['onbehalf_location'])) {
-                foreach ($params['onbehalf_location'] as $block => $vals) {
-                    //fix for custom data (of type checkbox, multi-select)
-                    if (substr($block, 0, 7) == 'custom_') {
-                        continue;
-                    }
-                    // fix the index of block elements
-                    if (is_array($vals)) {
-                        foreach ($vals as $key => $val) {
-                            //dont adjust the index of address block as
-                            //it's index is WRT to location type
-                            $newKey = ($block == 'address') ? $key : ++$key;
-                            $behalfOrganization[$block][$newKey] = $val;
-                        }
-                    }
-                }
-                unset($params['onbehalf_location']);
-            }
-            if (!empty($params['onbehalf[image_URL]'])) {
-                $behalfOrganization['image_URL'] = $params['onbehalf[image_URL]'];
-            }
-        }
-
-        // check for profile double opt-in and get groups to be subscribed
-        $subscribeGroupIds = CRM_Core_BAO_UFGroup::getDoubleOptInGroupIds($params, $contactID);
-
-        // since we are directly adding contact to group lets unset it from mailing
-        if (!empty($addToGroups)) {
-            foreach ($addToGroups as $groupId) {
-                if (isset($subscribeGroupIds[$groupId])) {
-                    unset($subscribeGroupIds[$groupId]);
-                }
-            }
-        }
-
-        foreach ($addToGroups as $k) {
-            if (array_key_exists($k, $subscribeGroupIds)) {
-                unset($addToGroups[$k]);
-            }
-        }
         $contactType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'contact_type');
 
         $contactID = CRM_Contact_BAO_Contact::createProfileContact(
             $params,
             $fields,
             $contactID,
-            $addToGroups,
+            NULL,
             NULL,
             $contactType,
             TRUE

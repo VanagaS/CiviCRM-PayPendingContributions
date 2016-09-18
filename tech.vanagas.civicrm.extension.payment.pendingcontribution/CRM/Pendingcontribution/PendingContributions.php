@@ -195,6 +195,7 @@ namespace tech\vanagas\civicrm\extension\payment\pendingcontribution {
             $params = array(
                 'sequential' => 1,
                 'contribution_page_id' => array('IS NOT NULL' => 1),
+                'contribution_recur_id' => array('IS NULL' => 1),
                 'contribution_status_id' =>
                     array('IN' =>
                         array("Pending")),

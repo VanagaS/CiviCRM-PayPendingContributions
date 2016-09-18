@@ -335,15 +335,7 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Confirm extends CRM_Pendingc
         // hack these in for test support.
         $form->_fields['billing_first_name'] = 1;
         $form->_fields['billing_last_name'] = 1;
-        // CRM-18854 - Set form values to allow pledge to be created for api test.
-        if (CRM_Utils_Array::value('pledge_block_id', $params)) {
-            $form->_values['pledge_block_id'] = $params['pledge_block_id'];
-            $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($params['id']);
-            $form->_values['max_reminders'] = $pledgeBlock['max_reminders'];
-            $form->_values['initial_reminder_day'] = $pledgeBlock['initial_reminder_day'];
-            $form->_values['additional_reminder_day'] = $pledgeBlock['additional_reminder_day'];
-            $form->_values['is_email_receipt'] = FALSE;
-        }
+
         $priceSetID = $form->_params['priceSetId'] = $paramsProcessedForForm['price_set_id'];
         $priceFields = CRM_Price_BAO_PriceSet::getSetDetail($priceSetID);
         $priceSetFields = reset($priceFields);
@@ -642,11 +634,6 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Confirm extends CRM_Pendingc
     {
         if (isset($paymentParams['financial_type'])) {
             $contributionTypeId = $paymentParams['financial_type'];
-        } elseif (!empty($this->_values['pledge_id'])) {
-            $contributionTypeId = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
-                $this->_values['pledge_id'],
-                'financial_type_id'
-            );
         }
         return $contributionTypeId;
     }

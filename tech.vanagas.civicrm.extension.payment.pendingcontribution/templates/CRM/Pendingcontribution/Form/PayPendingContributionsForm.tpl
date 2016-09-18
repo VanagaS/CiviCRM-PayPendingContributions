@@ -56,10 +56,9 @@
                 <tr>
                     <td class="label">{ts}Total Amount{/ts}</td>
                     <td><strong><a class="nowrap bold crm-expand-row" title="{ts}view payments{/ts}"
-                                   href="{crmURL p='civicrm/pay' q="view=transaction&component=contribution&action=browse&cid=`$contact_id`&id=`$contribution_id`&selector=1"}">
+                                   href="#">
                                 &nbsp; {$contrib->getAmount()|crmMoney:$contrib->getCurrency()}
-                        </strong></a>&nbsp;<span
-                                style="font-style: italic">&nbsp;{ts}(click on the amount to see a list of any past payments){/ts}</span>&nbsp;
+                        </strong></a>
                         {if $contribution_recur_id}
                             <strong>{ts}Recurring Contribution{/ts}</strong>
                             <br/>

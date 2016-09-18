@@ -8,8 +8,21 @@
  */
 class CRM_Pendingcontribution_VersionCompatibility
 {
-    public static function getInvoiceSettings($name) {
-        if(CRM_Civicrmpostcodelookup_Utils::getCiviVersion() >= 4.7) {
+    /**
+     * Get CiviCRM version using SQL
+     * Using function to get version is not compatible with all versions
+     */
+    public static function getCiviVersion()
+    {
+        $sql = "SELECT version FROM civicrm_domain";
+        $dao = CRM_Core_DAO::executeQuery($sql);
+        $dao->fetch();
+        return $dao->version;
+    }
+
+    public static function getInvoiceSettings($name)
+    {
+        if (self::getCiviVersion() >= 4.7) {
             return Civi::settings()->get($name);
         } else {
             return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, $name);
@@ -20,7 +33,8 @@ class CRM_Pendingcontribution_VersionCompatibility
      * Add JS to show icons for the accepted credit cards.
      * Taken from 4.7.10 version of CiviCRM -- /CRM/Financial/Form/Payment
      */
-    public static function addCreditCardJs() {
+    public static function addCreditCardJs()
+    {
         $creditCardTypes = CRM_Core_Payment_Form::getCreditCardCSSNames();
         CRM_Core_Resources::singleton()
             ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js', 10)
@@ -41,7 +55,8 @@ class CRM_Pendingcontribution_VersionCompatibility
      *
      * @return array
      */
-    public static function getPaymentProcessorReadyAddressParams($params, $billingLocationTypeID) {
+    public static function getPaymentProcessorReadyAddressParams($params, $billingLocationTypeID)
+    {
 
         list($hasBillingField, $addressParams) = self::getBillingAddressParams($params, $billingLocationTypeID);
         foreach ($addressParams as $name => $field) {
@@ -61,7 +76,8 @@ class CRM_Pendingcontribution_VersionCompatibility
      *
      * @return array
      */
-    protected static function getBillingAddressParams($params, $billingLocationTypeID) {
+    protected static function getBillingAddressParams($params, $billingLocationTypeID)
+    {
         $hasBillingField = FALSE;
         $billingFields = array(
             'street_address',
@@ -122,7 +138,8 @@ class CRM_Pendingcontribution_VersionCompatibility
         $component = 'contribution',
         $isTest,
         $isRecur
-    ) {
+    )
+    {
         CRM_Core_Payment_Form::mapParams($form->_bltID, $form->_params, $paymentParams, TRUE);
         $lineItems = $form->_lineItem;
 
@@ -234,15 +251,15 @@ class CRM_Pendingcontribution_VersionCompatibility
                     $result['contribution'] = $contribution;
                     /* Irrespective of whether payment processor has option of sending receipt, we just send an e-mail */
                     if (!empty($result['payment_status_id']) && $result['payment_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution',
-                            'status_id', 'Pending')) {
+                            'status_id', 'Pending')
+                    ) {
                         CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
                             $form->_values,
                             $contribution->is_test
                         );
                     }
                     return $result;
-                }
-                catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+                } catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
                     // Clean up DB as appropriate.
                     if (!empty($paymentParams['contributionID'])) {
                         CRM_Contribute_BAO_Contribution::failPayment($paymentParams['contributionID'],
@@ -272,8 +289,7 @@ class CRM_Pendingcontribution_VersionCompatibility
                 'contribution' => $contribution,
                 'payment_processor_id' => 0,
             );
-        }
-        elseif (empty($form->_values['amount'])) {
+        } elseif (empty($form->_values['amount'])) {
             // If the amount is not in _values[], set it
             $form->_values['amount'] = $form->_params['amount'];
         }
@@ -315,7 +331,7 @@ class CRM_Pendingcontribution_VersionCompatibility
      * @return \CRM_Contribute_DAO_Contribution
      * @throws \Exception
      */
-    public static function  processFormContribution(
+    public static function processFormContribution(
         &$form,
         $params,
         $result,
@@ -324,7 +340,8 @@ class CRM_Pendingcontribution_VersionCompatibility
         $online,
         $billingLocationID,
         $isRecur
-    ) {
+    )
+    {
         $transaction = new CRM_Core_Transaction();
         $contactID = $contributionParams['contact_id'];
 
@@ -363,8 +380,7 @@ class CRM_Pendingcontribution_VersionCompatibility
                         if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
                             if (isset($dataArray[$value['tax_rate']])) {
                                 $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
-                            }
-                            else {
+                            } else {
                                 $dataArray[$value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
                             }
                         }
@@ -389,8 +405,7 @@ class CRM_Pendingcontribution_VersionCompatibility
                 $contribution->id,
                 'Contribution'
             );
-        }
-        elseif ($contribution) {
+        } elseif ($contribution) {
             //handle custom data.
             $params['contribution_id'] = $contribution->id;
             if (!empty($params['custom']) &&
@@ -415,8 +430,7 @@ class CRM_Pendingcontribution_VersionCompatibility
 
         if (isset($params['related_contact'])) {
             $contactID = $params['related_contact'];
-        }
-        elseif (isset($params['cms_contactID'])) {
+        } elseif (isset($params['cms_contactID'])) {
             $contactID = $params['cms_contactID'];
         }
 
@@ -455,7 +469,8 @@ class CRM_Pendingcontribution_VersionCompatibility
      *
      * @return int|null
      */
-    public static function processRecurringContribution(&$form, &$params, $contactID, $contributionType) {
+    public static function processRecurringContribution(&$form, &$params, $contactID, $contributionType)
+    {
 
         if (empty($params['is_recur'])) {
             return NULL;
@@ -536,7 +551,8 @@ class CRM_Pendingcontribution_VersionCompatibility
      *
      * @return bool
      */
-    static protected function isPaymentTransaction($form) {
+    static protected function isPaymentTransaction($form)
+    {
         if (!empty($form->_values['is_monetary']) && $form->_amount >= 0.0) {
             return TRUE;
         }
@@ -560,11 +576,11 @@ class CRM_Pendingcontribution_VersionCompatibility
      *
      * @return array
      */
-    protected static function getNonDeductibleAmount($params, $financialType, $online) {
+    protected static function getNonDeductibleAmount($params, $financialType, $online)
+    {
         if (isset($params['non_deductible_amount']) && (!empty($params['non_deductible_amount']))) {
             return $params['non_deductible_amount'];
-        }
-        else {
+        } else {
             if ($financialType->is_deductible) {
                 if ($online && isset($params['selectProduct'])) {
                     $selectProduct = CRM_Utils_Array::value('selectProduct', $params);
@@ -583,18 +599,15 @@ class CRM_Pendingcontribution_VersionCompatibility
                     if ($params['amount'] < $productDAO->price) {
                         $nonDeductibleAmount = $params['amount'];
                         return $nonDeductibleAmount;
-                    }
-                    // product value does NOT exceed contribution amount
+                    } // product value does NOT exceed contribution amount
                     else {
                         return $productDAO->price;
                     }
-                }
-                // contribution is deductible - but there is no product
+                } // contribution is deductible - but there is no product
                 else {
                     return '0.00';
                 }
-            }
-            // contribution is NOT deductible
+            } // contribution is NOT deductible
             else {
                 return $params['amount'];
             }
@@ -610,7 +623,8 @@ class CRM_Pendingcontribution_VersionCompatibility
      * @param int $entityID
      * @param $customFieldExtends
      */
-    public static function customValueTablePostProcess(&$params, $entityTable, $entityID, $customFieldExtends) {
+    public static function customValueTablePostProcess(&$params, $entityTable, $entityID, $customFieldExtends)
+    {
         $customData = self::customFieldPostProcess($params,
             $entityID,
             $customFieldExtends
@@ -639,7 +653,8 @@ class CRM_Pendingcontribution_VersionCompatibility
         $customFieldExtends,
         $inline = FALSE,
         $checkPermissions = TRUE
-    ) {
+    )
+    {
         $customData = array();
 
         foreach ($params as $key => $value) {
@@ -685,7 +700,8 @@ class CRM_Pendingcontribution_VersionCompatibility
      */
     public static function getContributionParams(
         $params, $financialTypeID, $nonDeductibleAmount, $pending,
-        $paymentProcessorOutcome, $receiptDate, $recurringContributionID) {
+        $paymentProcessorOutcome, $receiptDate, $recurringContributionID)
+    {
 
         $contributionParams = array(
             'id' => $params['contribution_id'],
@@ -733,15 +749,15 @@ class CRM_Pendingcontribution_VersionCompatibility
 
         /* Since we generate invoice ID automatically, check if given invoice_id already exists in the database */
         if (isset($contributionParams['invoice_id'])) {
-           /* while(CRM_Core_DAO::getFieldValue(
-                'CRM_Contribute_DAO_Contribution',
-                $contributionParams['invoice_id'],
-                'id',
-                'invoice_id'
-            )) {
-                $params['invoiceID'] = md5(uniqid(rand(), TRUE));
-                $contributionParams['invoice_id'] = $params['invoiceID'];
-            };*/
+            /* while(CRM_Core_DAO::getFieldValue(
+                 'CRM_Contribute_DAO_Contribution',
+                 $contributionParams['invoice_id'],
+                 'id',
+                 'invoice_id'
+             )) {
+                 $params['invoiceID'] = md5(uniqid(rand(), TRUE));
+                 $contributionParams['invoice_id'] = $params['invoiceID'];
+             };*/
         }
 
         return $contributionParams;

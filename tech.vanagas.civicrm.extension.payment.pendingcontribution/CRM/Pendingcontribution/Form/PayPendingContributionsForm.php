@@ -74,17 +74,6 @@ class CRM_Pendingcontribution_Form_PayPendingContributionsForm extends CRM_Core_
      */
     protected $_errorMessage;
 
-
-
-    /**
-     * Custom debugging
-     */
-    function xdebug($somevar)
-    {
-        xdebug_enable();
-        xdebug_var_dump($somevar);
-    }
-
     /**
      * Set variables up before form is built.
      */

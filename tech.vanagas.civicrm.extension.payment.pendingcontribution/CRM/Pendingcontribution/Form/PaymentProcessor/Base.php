@@ -15,6 +15,13 @@ use \tech\vanagas\civicrm\extension\payment\pendingcontribution\ContributionPage
 class CRM_Pendingcontribution_Form_PaymentProcessor_Base extends CRM_Core_Form
 {
     /**
+     * Contribution ID : if there is not a list of contributions
+     *
+     * @var int (Contribution ID)
+     */
+    public $_contributionID;
+
+    /**
      * Pending contributions
      *
      * @var array (PendingContributions)
@@ -60,6 +67,8 @@ class CRM_Pendingcontribution_Form_PaymentProcessor_Base extends CRM_Core_Form
         } else {
             $contribution_id = $this->get('contribution_id');
         }
+        $this->_contributionID = $contribution_id;
+
         if(!$contribution_id) {
             CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/pay-pending-contributions-form', 'reset=1'));
         }
